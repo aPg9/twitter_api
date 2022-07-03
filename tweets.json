@@ -1,1 +1,41 @@
-[{"tweet_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", "content": "Mi primer tweet", "created_at": "2022-07-02 20:33:20.444256", "updated_at": "2022-07-03 01:33:33.035000+00:00", "by": {"user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", "email": "adrian@example.com", "first_name": "Adrian", "last_name": "Posada", "birth_date": "2022-07-03"}}, {"tweet_id": "3fa85f64-5717-4562-b3fc-2c963f66afa4", "content": "Hola este es mi primer tweet", "created_at": "2022-07-02 20:33:20.444256", "updated_at": "2022-07-03 01:36:52.843000+00:00", "by": {"user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", "email": "miguel@example.com", "first_name": "Miguel", "last_name": "Lopez", "birth_date": "2022-07-03"}}, {"tweet_id": "3fa85f64-5717-4562-b3fc-2c963f66afa4", "content": "Me voy de twitter", "created_at": "2022-07-02 20:33:20.444256", "updated_at": "2022-07-03 01:36:52.843000+00:00", "by": {"user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", "email": "rocio@example.com", "first_name": "Rocio", "last_name": "Perez", "birth_date": "2022-07-03"}}]
+[
+  {
+    "tweet_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "content": "Mi primer tweet",
+    "created_at": "2022-07-02 20:33:20.444256",
+    "updated_at": "2022-07-03 01:33:33.035000+00:00",
+    "by": {
+      "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "email": "adrian@example.com",
+      "first_name": "Adrian",
+      "last_name": "Posada",
+      "birth_date": "2022-07-03"
+    }
+  },
+  {
+    "tweet_id": "3fa85f64-5717-4562-b3fc-2c963f66afa4",
+    "content": "Hola este es mi primer tweet",
+    "created_at": "2022-07-02 20:33:20.444256",
+    "updated_at": "2022-07-03 01:36:52.843000+00:00",
+    "by": {
+      "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "email": "miguel@example.com",
+      "first_name": "Miguel",
+      "last_name": "Lopez",
+      "birth_date": "2022-07-03"
+    }
+  },
+  {
+    "tweet_id": "3fa85f64-5717-4562-b3fc-2c963f66afa4",
+    "content": "Me voy de twitter",
+    "created_at": "2022-07-02 20:33:20.444256",
+    "updated_at": "2022-07-03 01:36:52.843000+00:00",
+    "by": {
+      "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "email": "rocio@example.com",
+      "first_name": "Rocio",
+      "last_name": "Perez",
+      "birth_date": "2022-07-03"
+    }
+  }
+]
