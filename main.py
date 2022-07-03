@@ -3,6 +3,7 @@ import json
 from typing import Optional, List
 from datetime import date
 from datetime import datetime
+from unittest import result
 from uuid import UUID 
 
 #Pydantic
@@ -122,7 +123,23 @@ def login():
     tags=["Users"]
 )
 def show_all_users():
-    pass  
+    """
+    This path operation shows all users in the app
+
+    Parameters:
+        -
+
+    Retunrs a json list with all users in the app, with the following keys:
+        - **user_id: UUID**
+        - **email: Emailstr**
+        - **first_name: str**
+        - **last_name: str**        
+        - **birth_date: date**
+    """  
+
+    with open("users.json", "r", encoding="utf-8") as f:
+        results = json.loads(f.read())                             #-----> Cargamos todo el contenido del archivo en la variable results
+        return results
 
 
 ### Show a user
