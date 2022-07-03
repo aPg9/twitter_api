@@ -1,1 +1,1 @@
-[]
+[{"user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", "email": "adrian@example.com", "first_name": "Adrian", "last_name": "Posada", "birth_date": "1970-01-01", "password": "hola123456"}, {"user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", "email": "maria@example.com", "first_name": "Maria", "last_name": "Calle", "birth_date": "2001-11-24", "password": "hola1124"}]

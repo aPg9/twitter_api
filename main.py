@@ -1,4 +1,5 @@
 # Python
+import json
 from typing import Optional, List
 from datetime import date
 from datetime import datetime
@@ -12,6 +13,7 @@ from pydantic import Field
 # Fastapi
 from fastapi import FastAPI
 from fastapi import status
+from fastapi import Body
 
 app = FastAPI()
 
@@ -40,7 +42,7 @@ class User(UserBase):
         min_length= 1,
         max_length= 50,
     )
-    birth_date: Optional[date] = False
+    birth_date: Optional[date] = Field(...,)
 
 class UserResgister(User):
     password: str = Field (
@@ -72,7 +74,7 @@ class Tweet(BaseModel):
     summary="Register a user",
     tags=["Users"]
 )
-def signup():
+def signup(user: UserResgister = Body(...)):     #-----> Convierte el body en un diccionario para que sea un json que pueda ser leido
     """
     Signup
 
@@ -82,14 +84,22 @@ def signup():
         -Request body parameter
             - **user: UserRegister**
 
-    Return a json with basic user information:
+    Returns a json with basic user information:
         - **user_id: UUID**
         - **email: Emailstr**
         - **first_name: str**
         - **last_name: str**        
-        - **birth_day: str**
+        - **birth_date: date**
     """
-    
+    with open ("users.json", "r+", encoding="utf-8") as f:
+        results = json.loads(f.read())                                #-----> La funcion loads del modulo json carga un string y lo transforma en un simil a json
+        user_dict = user.dict()                                       #-----> Se transforma el rquest body (json) en diccionario y lo guardo en la variable user_dict
+        user_dict["user_id"] = str(user_dict["user_id"])
+        user_dict["birth_date"] = str(user_dict["birth_date"])
+        results.append(user_dict)
+        f.seek(0)                                                     #-----> Se posiciona al inicio del archivo para que no escriba mas diccionarios 
+        f.write(json.dumps(results))                                  #-----> Agarra el diccionario y lo transforma nuevamente a un json
+        return user
 
 ### Login a user
 @app.post(
