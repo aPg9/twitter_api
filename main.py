@@ -1,9 +1,10 @@
 # Python
+from http.client import HTTPException
 import json
 from typing import Optional, List
 from datetime import date
 from datetime import datetime
-from uuid import UUID 
+from uuid import UUID
 
 #Pydantic
 from pydantic import BaseModel 
@@ -13,7 +14,7 @@ from pydantic import Field
 # Fastapi
 from fastapi import FastAPI
 from fastapi import status
-from fastapi import Body
+from fastapi import Body, Form, Path
 
 app = FastAPI()
 
@@ -29,6 +30,15 @@ class UserLogin(UserBase):
         min_length= 8,
         max_length= 64 
     )  
+
+class LoginOut(BaseModel):
+    username: str = Field(
+        ...,
+        max_length= 20,
+    )
+    message: str = Field(
+        default= "Login Successfully!!"
+    )
 
 class User(UserBase):
     
@@ -109,9 +119,24 @@ def signup(user: UserResgister = Body(...)):     #-----> Convierte el body en un
     summary="Login a user",
     tags=["Users"]
 )
-def login():
-    pass  
+def login(
+    username: str = Form(...),
+    password: str = Form(...)
+    ):
+    """
+    Login
 
+    This path operation login a user in the app.
+
+    Parameters:
+    - Request body parameter:
+        - **username: str** --> Return a model with username.
+        - **password: str** --> Do not return person's password.
+    
+    Sing up a user of the app.
+
+    """    
+    return LoginOut(username=username)
 
 ### Show all users 
 @app.get(
@@ -203,7 +228,7 @@ def home():
     """  
 
     with open("tweets.json", "r", encoding="utf-8") as f:
-        results = json.loads(f.read())                             #-----> Cargamos todo el contenido del archivo en la variable results
+        results = json.loads(f.read())                           
         return results
    
 
@@ -254,27 +279,86 @@ def post(tweet: Tweet = Body(...)):     #-----> Le pedimos al usuario que nos en
     summary="Show a tweet",
     tags=["Tweets"]
 )
-def show_a_tweet():
-    pass
+def show_a_tweet(tweet_id: UUID = Path(
+    ...,
+    title="User ID",
+    description="Enter User ID",
+    example="3fa85f64-5717-4562-b3fc-2c963f66afa2")
+    ):
+    """
+    This path operation shows a tweet in the app
+
+    Parameters:
+        -
+
+    Retunrs a json list with a tweet in the app, with the following keys:
+        - **tweet_id: UUID**
+        - **content: str** 
+        - **created_at: datetime** 
+        - **updated_at: Optional[datetime]** 
+        - **by: User** 
+    """
+     
+    with open("tweets.json", "r", encoding="utf-8") as f:
+        results = json.loads(f.read())
+        tweet_id = str(tweet_id)                                       
+        
+        for data in results:
+            if data["tweet_id"] == tweet_id:
+                f.seek(0)
+                return data
+            else: raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"¡This user_id doesn't exist!"
+        )
+
+
 
 ### Post a tweet
 @app.delete(
     path="/tweets/{tweet_id}/delete",
     response_model=Tweet,
     status_code=status.HTTP_200_OK,
-    summary="Delete a tweet",
+    summary="Deletes a tweet",
     tags=["Tweets"]
 )
 def delete_a_tweet():
     pass
 
-@app.put(
+
+@app.post(
     path="/tweets/{tweet_id}/update",
     response_model=Tweet,
-    status_code=status.HTTP_200_OK,
-    summary="Delete a tweet",
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Updates a tweet",
     tags=["Tweets"]
 )
 def update_a_tweet():
-    pass
+    """
+    This path operation updates a tweet in the app
+
+    Parameters:
+        -
+
+    Retunrs a json list with a tweet in the app, with the following keys:
+        - **tweet_id: UUID**
+        - **content: str** 
+        - **created_at: datetime** 
+        - **updated_at: Optional[datetime]** 
+        - **by: User** 
+    """    
+    with open("tweets.json", "r+", encoding="utf-8") as f:
+        results = json.loads(f.read())
+    for tweet in results:
+        if tweet["tweet_id"] in results:
+            tweet_dict = tweet.dict()                                       
+            tweet_dict["tweet_id"] = str(tweet_dict["tweet_id"])
+            tweet_dict["updated_at"] = str(tweet_dict["updated_at"])
+            tweet_dict["by"]["user_id"] = str(tweet_dict["by"]["user_id"])
+            tweet_dict["by"]["birth_date"] = str (tweet_dict["by"]["birth_date"])        
+            results.append(tweet_dict)
+            f.seek(0)                                                      
+            f.write(json.dumps(results))                                  
+            return tweet      
+ 
 
