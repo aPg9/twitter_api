@@ -2,8 +2,7 @@
 from http.client import HTTPException
 import json
 from typing import Optional, List
-from datetime import date
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
 #Pydantic
@@ -18,10 +17,11 @@ from fastapi import Body, Form, Path
 
 app = FastAPI()
 
+
 # Models
 
 class UserBase(BaseModel):
-    user_id: UUID = Field(...)
+    user_id: UUID = Field (...)
     email: EmailStr = Field(...)
 
 class UserLogin(UserBase):
@@ -40,8 +40,7 @@ class LoginOut(BaseModel):
         default= "Login Successfully!!"
     )
 
-class User(UserBase):
-    
+class User(UserBase):    
     first_name: str = Field(
         ...,
         min_length= 1,
@@ -72,7 +71,46 @@ class Tweet(BaseModel):
     updated_at: Optional[datetime] = Field(default=None)
     by: User = Field(...)
 
-# Path Operations
+
+# Auxiliar functions
+
+def read_data(file):
+    with open(f"{file}.json", "r+", encoding="utf-8") as f:
+        return json.loads(f.read())
+
+def overwrite_data(file, result_list):
+    with open(f"{file}.json", "w", encoding="utf-8") as f:
+        f.seek(0)
+        f.write(json.dumps(result_list))
+
+def show_data(file, id, info):
+    results = read_data(file)
+    id = str(id)
+    for data in results:
+        if data[f"{info}_id"] == id:
+            return data
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"¡This {info} doesn't exist!"
+        )
+
+def delete_data(file, id, info):
+    results = read_data(file)
+    id = str(id)
+    for data in results:
+        if data[f"{info}_id"] == id:
+            results.remove(data)
+            overwrite_data(file, results)
+            return data
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"¡This {info} doesn't exist!"
+        )
+
+
+#-----> Path Operations
 
 ## Users
 
@@ -84,7 +122,7 @@ class Tweet(BaseModel):
     summary="Register a user",
     tags=["Users"]
 )
-def signup(user: UserResgister = Body(...)):     #-----> Convierte el body en un diccionario para que sea un json que pueda ser leido
+def signup(user: UserResgister = Body(...)):     
     """
     Signup
 
@@ -101,15 +139,13 @@ def signup(user: UserResgister = Body(...)):     #-----> Convierte el body en un
         - **last_name: str**        
         - **birth_date: date**
     """
-    with open ("users.json", "r+", encoding="utf-8") as f:
-        results = json.loads(f.read())                                #-----> La funcion loads del modulo json carga un string y lo transforma en un simil a json
-        user_dict = user.dict()                                       #-----> Se transforma el rquest body (json) en diccionario y lo guardo en la variable user_dict
-        user_dict["user_id"] = str(user_dict["user_id"])
-        user_dict["birth_date"] = str(user_dict["birth_date"])
-        results.append(user_dict)
-        f.seek(0)                                                     #-----> Se posiciona al inicio del archivo para que no escriba mas diccionarios 
-        f.write(json.dumps(results))                                  #-----> Agarra el diccionario y lo transforma nuevamente a un json
-        return user
+    results = read_data("users")
+    user_dict = user.dict()
+    user_dict["user_id"] = str(user_dict["user_id"])
+    user_dict["birth_date"] = str(user_dict["birth_date"])
+    results.append(user_dict)
+    overwrite_data("users", results)
+    
 
 ### Login a user
 @app.post(
@@ -159,8 +195,7 @@ def show_all_users():
         - **first_name: str**
         - **last_name: str**        
         - **birth_date: date**
-    """  
-
+        """  
     with open("users.json", "r", encoding="utf-8") as f:
         results = json.loads(f.read())                             #-----> Cargamos todo el contenido del archivo en la variable results
         return results
@@ -174,8 +209,25 @@ def show_all_users():
     summary="Show a user",
     tags=["Users"]
 )
-def show_a_user():
-    pass  
+def show_a_user(user_id: str = Path(
+    ...,
+    title="User's ID",
+    description="Enter User's ID",
+    example="3fa85f64-5717-4562-b3fc-2c963f66afa2")):
+    """
+    This path operation shows a user in the app
+
+    Parameters:
+        -
+
+    Retunrs a json list with a user that has been registered in the app, following the next keys:
+        - **tweet_id: UUID**
+        - **content: str** 
+        - **created_at: datetime** 
+        - **updated_at: Optional[datetime]** 
+        - **by: User** 
+    """
+    return show_data("users", user_id, "user")  
 
 
 ### Delete a user
@@ -186,9 +238,27 @@ def show_a_user():
     summary="Delete a user",
     tags=["Users"]
 )
-def delete_a_user():
-    pass  
+def delete_a_user(user_id: str = Path(
+    ...,
+    title="User ID",
+    description="Enter a User ID",
+    example="3fa85f64-5717-4562-b3fc-2c963f66afa2")
+    ):
+    """
+    This path operation updates a tweet in the app
 
+    Parameters:
+        -
+
+    Retunrs a json list with a tweet in the app, with the following keys:
+        - **tweet_id: UUID**
+        - **content: str** 
+        - **created_at: datetime** 
+        - **updated_at: Optional[datetime]** 
+        - **by: User** 
+    """   
+    return delete_data("users", user_id,"user")
+    
 
 ### Update a user
 @app.put(
@@ -198,13 +268,46 @@ def delete_a_user():
     summary="Update a user",
     tags=["Users"]
 )
-def update_a_user():
-    pass  
+def update_a_user(user_id: str = Path(
+    ...,
+    title="User ID",
+    description="Enter a User ID",
+    example="3fa85f64-5717-4562-b3fc-2c963f66afa2"),
+    user: UserResgister = Body(...)
+    ):
+    """
+    This path operation updates a tweet in the app
+
+    Parameters:
+        -
+
+    Retunrs a json list with a tweet in the app, with the following keys:
+        - **tweet_id: UUID**
+        - **content: str** 
+        - **created_at: datetime** 
+        - **updated_at: Optional[datetime]** 
+        - **by: User** 
+    """   
+    user_id = str(user_id)
+    user_dict = user.dict()
+    user_dict["user_id"] = str(user_dict["user_id"])
+    user_dict["birth_date"] = str(user_dict["birth_date"])
+      
+    results = read_data("users")
+    for user in results:
+        if user["user_id"] == user_id:
+            results[results.index(user)] = user_dict           
+            overwrite_data("users", results) 
+            return user    
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="This tweet doesn't exist!") 
 
 
-## Tweets
-
+##-----> Tweets
 ### Show all tweets
+
 @app.get(
     path="/",
     response_model=List[Tweet],
@@ -233,6 +336,7 @@ def home():
    
 
 ### Post a tweet
+
 @app.post(
     path="/post",
     response_model=Tweet,
@@ -272,6 +376,7 @@ def post(tweet: Tweet = Body(...)):     #-----> Le pedimos al usuario que nos en
   
 
 ### Show a tweet
+
 @app.get(
     path="/tweets/{tweet_id}",
     response_model=Tweet,
@@ -279,10 +384,10 @@ def post(tweet: Tweet = Body(...)):     #-----> Le pedimos al usuario que nos en
     summary="Show a tweet",
     tags=["Tweets"]
 )
-def show_a_tweet(tweet_id: UUID = Path(
+def show_a_tweet(tweet_id: str = Path(
     ...,
-    title="User ID",
-    description="Enter User ID",
+    title="Tweet ID",
+    description="Enter a Tweet ID",
     example="3fa85f64-5717-4562-b3fc-2c963f66afa2")
     ):
     """
@@ -298,23 +403,11 @@ def show_a_tweet(tweet_id: UUID = Path(
         - **updated_at: Optional[datetime]** 
         - **by: User** 
     """
-     
-    with open("tweets.json", "r", encoding="utf-8") as f:
-        results = json.loads(f.read())
-        tweet_id = str(tweet_id)                                       
-        
-        for data in results:
-            if data["tweet_id"] == tweet_id:
-                f.seek(0)
-                return data
-            else: raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"¡This user_id doesn't exist!"
-        )
+    return show_data("tweets", tweet_id, "tweet")
+    
+    
+### Delete a tweet
 
-
-
-### Post a tweet
 @app.delete(
     path="/tweets/{tweet_id}/delete",
     response_model=Tweet,
@@ -322,9 +415,27 @@ def show_a_tweet(tweet_id: UUID = Path(
     summary="Deletes a tweet",
     tags=["Tweets"]
 )
-def delete_a_tweet():
-    pass
+def delete_a_tweet(tweet_id: str = Path(
+    ...,
+    title="Delete Tweet",
+    description="Deletes a tweet",
+    example="3fa85f64-5717-4562-b3fc-2c963f66afa2")
+    ):
+    """
+    Delete a Tweet
 
+    This path operation delete a tweet from the app
+
+    Parameters:
+        - tweet_id: UUID
+
+    Deletes a tweet from database.
+        
+    """
+    delete_data("tweets", tweet_id, "tweet")
+
+
+# Update a tweet    
 
 @app.post(
     path="/tweets/{tweet_id}/update",
@@ -333,7 +444,19 @@ def delete_a_tweet():
     summary="Updates a tweet",
     tags=["Tweets"]
 )
-def update_a_tweet():
+
+def update_a_tweet(tweet_id: str = Path(
+    ...,
+    title="Tweet ID",
+    description="Enter a Tweet ID",
+    example="3fa85f64-5717-4562-b3fc-2c963f66afa2"),
+    content: str = Form(
+        ..., 
+        min_length=1,
+        max_length=256,
+        title="Tweet content",
+        description="This is the content of the tweet")
+    ):
     """
     This path operation updates a tweet in the app
 
@@ -346,19 +469,19 @@ def update_a_tweet():
         - **created_at: datetime** 
         - **updated_at: Optional[datetime]** 
         - **by: User** 
-    """    
-    with open("tweets.json", "r+", encoding="utf-8") as f:
-        results = json.loads(f.read())
-    for tweet in results:
-        if tweet["tweet_id"] in results:
-            tweet_dict = tweet.dict()                                       
-            tweet_dict["tweet_id"] = str(tweet_dict["tweet_id"])
-            tweet_dict["updated_at"] = str(tweet_dict["updated_at"])
-            tweet_dict["by"]["user_id"] = str(tweet_dict["by"]["user_id"])
-            tweet_dict["by"]["birth_date"] = str (tweet_dict["by"]["birth_date"])        
-            results.append(tweet_dict)
-            f.seek(0)                                                      
-            f.write(json.dumps(results))                                  
-            return tweet      
- 
+    """   
+    tweet_id = str(tweet_id)
+    results = read_data("tweets")  
 
+    for tweet in results:
+        if tweet["tweet_id"] == tweet_id:
+            tweet["tweet_id"] = str(tweet["tweet_id"])
+            tweet["content"] = content
+            tweet["updated_at"] = str(datetime.now())
+            print(tweet)
+            overwrite_data("tweets", results) 
+            return tweet    
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="This tweet doesn't exist!") 
