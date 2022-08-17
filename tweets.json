@@ -1,0 +1,67 @@
+[
+    {
+        "tweet_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "content": "El primer tweet luego de sacarle los bugs al codigo la puta madre",
+        "created_at": "2022-07-05 17:44:32.165558",
+        "updated_at": "2022-07-05 22:45:40.153000+00:00",
+        "by": {
+            "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "email": "adrian@example.com",
+            "first_name": "Adrian",
+            "last_name": "Posada",
+            "birth_date": "1991-07-05"
+        }
+    },
+    {
+        "tweet_id": "3fa85f64-5717-4562-b3fc-2c963f66af01",
+        "content": "Probando a ver como va la app",
+        "created_at": "2022-07-05 17:44:32.165558",
+        "updated_at": "2022-07-05 22:45:40.153000+00:00",
+        "by": {
+            "user_id": "3fa85f64-5717-4562-b3fc-2c963f66af11",
+            "email": "pedro@example.com",
+            "first_name": "Pedro",
+            "last_name": "Hinestroza",
+            "birth_date": "1993-07-05"
+        }
+    },
+    {
+        "tweet_id": "3fa85f64-5717-4562-b3fc-2c963f66af03",
+        "content": "Probando la app, espero no se aburrida",
+        "created_at": "2022-07-05 17:44:32.165558",
+        "updated_at": "2022-07-05 22:45:40.153000+00:00",
+        "by": {
+            "user_id": "3fa85f64-5717-4562-b3fc-2c963f66af13",
+            "email": "camilo@example.com",
+            "first_name": "Camilo",
+            "last_name": "Perez",
+            "birth_date": "1997-07-05"
+        }
+    },
+    {
+        "tweet_id": "3fa85f64-5717-4562-b3fc-2c963f66af04",
+        "content": "Ya no me estan picando",
+        "created_at": "2022-07-05 17:44:32.165558",
+        "updated_at": "2022-07-05 18:22:50.437527",
+        "by": {
+            "user_id": "3fa85f64-5717-4562-b3fc-2c963f66af14",
+            "email": "sofia@example.com",
+            "first_name": "Sofia",
+            "last_name": "Cuadros",
+            "birth_date": "1999-05-25"
+        }
+    },
+    {
+        "tweet_id": "3fa85f64-5717-4562-b3fc-2c963f66af05",
+        "content": "App mala, me aburre y me voy",
+        "created_at": "2022-07-05 17:44:32.165558",
+        "updated_at": "2022-07-05 22:45:40.153000+00:00",
+        "by": {
+            "user_id": "3fa85f64-5717-4562-b3fc-2c963f66af15",
+            "email": "ana@example.com",
+            "first_name": "Ana Maria",
+            "last_name": "Perez",
+            "birth_date": "1989-05-25"
+        }
+    }
+]
